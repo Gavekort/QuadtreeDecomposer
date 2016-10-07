@@ -57,6 +57,18 @@
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
     </property>
+    <property name="invertedAppearance">
+     <bool>false</bool>
+    </property>
+    <property name="invertedControls">
+     <bool>false</bool>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksAbove</enum>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
    </widget>
    <widget class="QLabel" name="sliderlabel">
     <property name="geometry">
