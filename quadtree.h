@@ -31,13 +31,14 @@ class Quadtree
         AABB boundary;
 
         cv::Vec3b avgColor;
-
         cv::Mat* frame; //pointer to unmodified frame
         cv::Mat* canvas; //frame that will be modified
 
         int level = 1;
         int* quantization;
+
     public:
+
         Quadtree() = delete;
         Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization);
 
@@ -47,6 +48,7 @@ class Quadtree
         void debug();
         void paint(cv::Vec3b color, AABB segment);
         cv::Vec3b segmentAverage(AABB segment);
+        bool segmentationNeeded(AABB segment, cv::Vec3b);
 };
 
 Quadtree::Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization) : frame(frame), canvas(canvas), quantization(quantization)
@@ -80,7 +82,7 @@ void Quadtree::debug(){
 void Quadtree::process(){
     avgColor = segmentAverage(boundary);
     paint(avgColor, boundary);
-    if(level <= *quantization){
+    if(level <= *quantization && segmentationNeeded(boundary, avgColor)){
         //std::cout << "Level: " << level << " " << boundary.x << " " << boundary.y << std::endl;
         subdivide();
     }
@@ -94,16 +96,16 @@ void Quadtree::subdivide()
     int offsety = frame->cols/(4*quantized);
 
     std::unique_ptr<Quadtree> nw(new Quadtree(frame, canvas, quantization,
-                                              AABB(boundary.x - offsetx, boundary.y - offsety, boundary.width/2, boundary.height/2),
+                                              AABB(boundary.x - offsetx, boundary.y - offsety, boundary.width/2 - 1, boundary.height/2 - 1),
                                               level + 1));
     std::unique_ptr<Quadtree> ne(new Quadtree(frame, canvas, quantization,
-                                              AABB(boundary.x + offsetx, boundary.y - offsety, boundary.width/2, boundary.height/2),
+                                              AABB(boundary.x + offsetx, boundary.y - offsety, boundary.width/2 - 1, boundary.height/2 - 1),
                                               level + 1));
     std::unique_ptr<Quadtree> sw(new Quadtree(frame, canvas, quantization,
-                                              AABB(boundary.x - offsetx, boundary.y + offsety, boundary.width/2, boundary.height/2),
+                                              AABB(boundary.x - offsetx, boundary.y + offsety, boundary.width/2 - 1, boundary.height/2 - 1),
                                               level + 1));
     std::unique_ptr<Quadtree> se(new Quadtree(frame, canvas, quantization,
-                                              AABB(boundary.x + offsetx, boundary.y + offsety, boundary.width/2, boundary.height/2),
+                                              AABB(boundary.x + offsetx, boundary.y + offsety, boundary.width/2 - 1, boundary.height/2 - 1),
                                               level + 1));
 }
 
@@ -130,5 +132,22 @@ cv::Vec3b Quadtree::segmentAverage(AABB segment){
     }
     return avg/count; //Is automatically casted to cv::Vec3b by specification
 }
+
+bool Quadtree::segmentationNeeded(AABB segment, cv::Vec3b avg){
+    int discrepancy = 0;
+    //std::cout << "Analyzing from: " << segment.y - segment.height/2 << ":" << segment.x - segment.width/2
+    //          << " to " << segment.x + segment.width/2 << ":" << segment.y + segment.height/2 << std::endl;
+    for (int y = segment.y - segment.height/2; y < segment.y + segment.height/2; y += 2) {
+            for (int x = segment.x - segment.width/2; x < segment.x + segment.width/2; x += 2) {
+                    discrepancy += cv::norm(frame->at<Vec3b>(x, y) - avg);
+            }
+    }
+    if(discrepancy > 500){
+        return true;
+    }else{
+        return false;
+    }
+}
+
 
 #endif // QUADTREE_H
