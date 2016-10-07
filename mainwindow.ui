@@ -32,7 +32,7 @@
      <rect>
       <x>10</x>
       <y>250</y>
-      <width>341</width>
+      <width>331</width>
       <height>20</height>
      </rect>
     </property>
@@ -43,16 +43,16 @@
      <number>10</number>
     </property>
     <property name="singleStep">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="pageStep">
      <number>2</number>
     </property>
     <property name="value">
-     <number>0</number>
+     <number>5</number>
     </property>
     <property name="sliderPosition">
-     <number>0</number>
+     <number>5</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -61,7 +61,7 @@
    <widget class="QLabel" name="sliderlabel">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>350</x>
       <y>250</y>
       <width>31</width>
       <height>20</height>
@@ -73,7 +73,44 @@
      </font>
     </property>
     <property name="text">
-     <string>0</string>
+     <string>5</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="threshold">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>280</y>
+      <width>331</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>10000</number>
+    </property>
+    <property name="pageStep">
+     <number>100</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sliderlabel_2">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>280</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>100</string>
     </property>
    </widget>
   </widget>

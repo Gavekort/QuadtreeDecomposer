@@ -24,6 +24,8 @@ private:
     QImage img;
 
     int* quantization;
+    int* threshold;
+
 signals:
     void processedImage(const QImage &image);
 protected:
@@ -36,7 +38,7 @@ public:
    //Destructor
    ~VideoProcessing();
    //Load a video from memory
-   bool loadVideo(int* q);
+   bool loadVideo(int* q, int* t);
    //Play the video
    void Play();
    //Stop the video

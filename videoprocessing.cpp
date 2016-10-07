@@ -30,14 +30,14 @@ bool VideoProcessing::isStopped() const{
     return this->stop;
 }
 
-bool VideoProcessing::loadVideo(int* q) {
+bool VideoProcessing::loadVideo(int* q, int* t) {
     capture.open(0);
     if (capture.isOpened())
     {
         //frameRate = (int) capture.get(CV_CAP_PROP_FPS);
-        frameRate = 0;
         quantization = q;
-
+        threshold = t;
+        frameRate = 0;
         return true;
     }
     else
@@ -64,8 +64,9 @@ void VideoProcessing::run()
             stop = true;
         }
         cv::Mat canvas = frame.clone();
-        std::unique_ptr<Quadtree> q(new Quadtree(&frame, &canvas, quantization));
+        std::unique_ptr<Quadtree> q(new Quadtree(&frame, &canvas, quantization, threshold));
         frame = canvas;
+        frame.at<Vec3b>(5, 5) = cv::Vec3b(255, 0, 0);
         if (frame.channels()== 3){
             cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
             img = QImage((const unsigned char*)(RGBframe.data),

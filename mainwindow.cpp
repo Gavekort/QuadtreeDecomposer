@@ -12,7 +12,9 @@ MainWindow::MainWindow(QWidget *parent) :
                               this, SLOT(updatePlayerUI(QImage)));
     QObject::connect(ui->quantizer, SIGNAL(valueChanged(int)),
                               this, SLOT(updateProgress(int)));
-    vp->loadVideo(&quantization);
+    QObject::connect(ui->threshold, SIGNAL(valueChanged(int)),
+                              this, SLOT(updateThreshold(int)));
+    vp->loadVideo(&quantization, &threshold);
     vp->Play();
 }
 
@@ -35,4 +37,9 @@ void MainWindow::updatePlayerUI(QImage img)
 void MainWindow::updateProgress(int value){
     ui->sliderlabel->setText(QString::number(value));
     quantization = value;
+}
+
+void MainWindow::updateThreshold(int value){
+    threshold = value;
+    ui->sliderlabel_2->setText(QString::number(value/100));
 }

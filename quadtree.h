@@ -21,7 +21,7 @@ struct AABB
 class Quadtree
 {
     private:
-        Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization, AABB boundary, int level);
+        Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization, int* threshold, AABB boundary, int level);
 
         std::unique_ptr<Quadtree> nw;
         std::unique_ptr<Quadtree> ne;
@@ -36,11 +36,12 @@ class Quadtree
 
         int level = 1;
         int* quantization;
+        int* threshold;
 
     public:
 
         Quadtree() = delete;
-        Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization);
+        Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization, int* threshold);
 
         cv::Mat* output();
         void process();
@@ -51,7 +52,8 @@ class Quadtree
         bool segmentationNeeded(AABB segment, cv::Vec3b);
 };
 
-Quadtree::Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization) : frame(frame), canvas(canvas), quantization(quantization)
+Quadtree::Quadtree(cv::Mat* frame, cv::Mat* canvas,
+                   int* quantization, int* threshold) : frame(frame), canvas(canvas), quantization(quantization), threshold(threshold)
 {
     nw = NULL;
     ne = NULL;
@@ -62,7 +64,7 @@ Quadtree::Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization) : frame(f
     process();
 }
 
-Quadtree::Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization, AABB boundary, int level) : frame(frame), canvas(canvas), quantization(quantization)
+Quadtree::Quadtree(cv::Mat* frame, cv::Mat* canvas, int* quantization, int* threshold, AABB boundary, int level) : frame(frame), canvas(canvas), quantization(quantization), threshold(threshold)
 {
     nw = NULL;
     ne = NULL;
@@ -95,17 +97,17 @@ void Quadtree::subdivide()
     int offsetx = frame->rows/(4*quantized);
     int offsety = frame->cols/(4*quantized);
 
-    std::unique_ptr<Quadtree> nw(new Quadtree(frame, canvas, quantization,
-                                              AABB(boundary.x - offsetx, boundary.y - offsety, boundary.width/2 - 1, boundary.height/2 - 1),
+    std::unique_ptr<Quadtree> nw(new Quadtree(frame, canvas, quantization, threshold,
+                                              AABB(boundary.x - offsetx, boundary.y - offsety, boundary.width/2, boundary.height/2),
                                               level + 1));
-    std::unique_ptr<Quadtree> ne(new Quadtree(frame, canvas, quantization,
-                                              AABB(boundary.x + offsetx, boundary.y - offsety, boundary.width/2 - 1, boundary.height/2 - 1),
+    std::unique_ptr<Quadtree> ne(new Quadtree(frame, canvas, quantization, threshold,
+                                              AABB(boundary.x + offsetx, boundary.y - offsety, boundary.width/2, boundary.height/2),
                                               level + 1));
-    std::unique_ptr<Quadtree> sw(new Quadtree(frame, canvas, quantization,
-                                              AABB(boundary.x - offsetx, boundary.y + offsety, boundary.width/2 - 1, boundary.height/2 - 1),
+    std::unique_ptr<Quadtree> sw(new Quadtree(frame, canvas, quantization, threshold,
+                                              AABB(boundary.x - offsetx, boundary.y + offsety, boundary.width/2, boundary.height/2),
                                               level + 1));
-    std::unique_ptr<Quadtree> se(new Quadtree(frame, canvas, quantization,
-                                              AABB(boundary.x + offsetx, boundary.y + offsety, boundary.width/2 - 1, boundary.height/2 - 1),
+    std::unique_ptr<Quadtree> se(new Quadtree(frame, canvas, quantization, threshold,
+                                              AABB(boundary.x + offsetx, boundary.y + offsety, boundary.width/2, boundary.height/2),
                                               level + 1));
 }
 
@@ -142,7 +144,7 @@ bool Quadtree::segmentationNeeded(AABB segment, cv::Vec3b avg){
                     discrepancy += cv::norm(frame->at<Vec3b>(x, y) - avg);
             }
     }
-    if(discrepancy > 500){
+    if(discrepancy > *threshold){
         return true;
     }else{
         return false;

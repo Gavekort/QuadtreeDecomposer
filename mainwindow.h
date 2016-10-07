@@ -22,10 +22,12 @@ private slots:
     //Display video frame in player UI
     void updatePlayerUI(QImage img);
     void updateProgress(int value);
+    void updateThreshold(int value);
 private:
     Ui::MainWindow *ui;
     VideoProcessing* vp;
     int quantization;
+    int threshold;
 };
 
 #endif // MAINWINDOW_H
