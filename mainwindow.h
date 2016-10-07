@@ -26,8 +26,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     VideoProcessing* vp;
-    int quantization;
-    int threshold;
+    int quantization = 5;
+    int threshold = 0;
 };
 
 #endif // MAINWINDOW_H
