@@ -80,11 +80,9 @@ void Quadtree::debug(){
 void Quadtree::process(){
     avgColor = segmentAverage(boundary);
     paint(avgColor, boundary);
-    if(level <= *quantization && boundary.x % 2 == 0 && boundary.y % 2 == 0){
+    if(level <= *quantization){
         //std::cout << "Level: " << level << " " << boundary.x << " " << boundary.y << std::endl;
         subdivide();
-    }else if(level <= *quantization){
-        std::cout << "Boundary is not divisible by 2 : " << boundary.x << "/" << boundary.y << std::endl;
     }
 }
 
